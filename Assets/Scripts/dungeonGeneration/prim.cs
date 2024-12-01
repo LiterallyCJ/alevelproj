@@ -7,10 +7,11 @@ public static class Prim {
     public class Edge : Graphs.Edge {
         public float Distance { get; private set; }
 
-        public Edge(Vertex u, Vertex v) : base(u, v) {
-            Distance = Vector3.Distance(u.Position, v.Position);
+        public Edge(Vertex u, Vertex v) : base(u, v) {                  // Overwrite the Edge's constructor method
+            Distance = Vector3.Distance(u.Position, v.Position);        // Don't define U and V in the edge, and instead calculate the distance between the vectors
         }
 
+        // Methods needed to be able to compare 2 edges (lines)
         public static bool operator ==(Edge left, Edge right) {
             return (left.U == right.U && left.V == right.V)
                 || (left.U == right.V && left.V == right.U);
@@ -46,7 +47,7 @@ public static class Prim {
             openSet.Add(edge.V);
         }
 
-        closedSet.Add(start);
+        closedSet.Add(start);                                       // Add the starting vertex to the closed set
 
         List<Edge> results = new List<Edge>();
 
@@ -59,6 +60,7 @@ public static class Prim {
                 int closedVertices = 0;
                 if (!closedSet.Contains(edge.U)) closedVertices++;
                 if (!closedSet.Contains(edge.V)) closedVertices++;
+                
                 if (closedVertices != 1) continue;
 
                 if (edge.Distance < minWeight) {
@@ -70,8 +72,10 @@ public static class Prim {
 
             if (!chosen) break;
             results.Add(chosenEdge);
+
             openSet.Remove(chosenEdge.U);
             openSet.Remove(chosenEdge.V);
+
             closedSet.Add(chosenEdge.U);
             closedSet.Add(chosenEdge.V);
         }

@@ -5,7 +5,7 @@ using Random = System.Random;
 using Graphs;
 
 public class generator : MonoBehaviour {
-    enum CellType {
+    enum cellType {
         None,
         Room,
         Hallway
@@ -24,12 +24,15 @@ public class generator : MonoBehaviour {
         }
     }
 
+    // Settings which can be changed in the inspector in unity editor
     [SerializeField]
     Vector2Int size;
     [SerializeField]
     int roomCount;
     [SerializeField]
     Vector2Int roomMaxSize;
+
+    // Required references
     [SerializeField]
     GameObject cubePrefab;
     [SerializeField]
@@ -38,7 +41,7 @@ public class generator : MonoBehaviour {
     Material blueMaterial;
 
     Random random;
-    grid<CellType> cells;
+    grid<cellType> cells;
     List<Room> rooms;
     delaunayTriangulation delaunay;
     HashSet<Prim.Edge> selectedEdges;
@@ -49,7 +52,7 @@ public class generator : MonoBehaviour {
 
     void Generate() {
         random = new Random(0);
-        cells = new grid<CellType>(size, Vector2Int.zero);
+        cells = new grid<cellType>(size, Vector2Int.zero);
         rooms = new List<Room>();
 
         PlaceRooms();
@@ -58,6 +61,7 @@ public class generator : MonoBehaviour {
         PathfindHallways();
     }
 
+    // Randomly place the chosen amount of rooms around the given area
     void PlaceRooms() {
         for (int i = 0; i < roomCount; i++) {
             Vector2Int location = new Vector2Int(
@@ -91,7 +95,7 @@ public class generator : MonoBehaviour {
                 PlaceRoom(newRoom.bounds.position, newRoom.bounds.size);
 
                 foreach (var pos in newRoom.bounds.allPositionsWithin) {
-                    cells[pos] = CellType.Room;
+                    cells[pos] = cellType.Room;
                 }
             }
         }
@@ -144,11 +148,11 @@ public class generator : MonoBehaviour {
                 
                 pathCost.cost = Vector2Int.Distance(b.Position, endPos);    //heuristic
 
-                if (cells[b.Position] == CellType.Room) {
+                if (cells[b.Position] == cellType.Room) {
                     pathCost.cost += 10;
-                } else if (cells[b.Position] == CellType.None) {
+                } else if (cells[b.Position] == cellType.None) {
                     pathCost.cost += 5;
-                } else if (cells[b.Position] == CellType.Hallway) {
+                } else if (cells[b.Position] == cellType.Hallway) {
                     pathCost.cost += 1;
                 }
 
@@ -161,8 +165,8 @@ public class generator : MonoBehaviour {
                 for (int i = 0; i < path.Count; i++) {
                     var current = path[i];
 
-                    if (cells[current] == CellType.None) {
-                        cells[current] = CellType.Hallway;
+                    if (cells[current] == cellType.None) {
+                        cells[current] = cellType.Hallway;
                     }
 
                     if (i > 0) {
@@ -173,7 +177,7 @@ public class generator : MonoBehaviour {
                 }
 
                 foreach (var pos in path) {
-                    if (cells[pos] == CellType.Hallway) {
+                    if (cells[pos] == cellType.Hallway) {
                         PlaceHallway(pos);
                     }
                 }
